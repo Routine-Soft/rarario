@@ -1,0 +1,247 @@
+/* ===================================================
+   1. VARIÁVEIS DE CORES (Tema Cinza / Prata - Atuação)
+   =================================================== */
+:root {
+    --bg-dark: #0d0f14;
+    
+    /* Degradês Cinza / Prata Metálico */
+    --gray-grad: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    --gray-glow: rgba(148, 163, 184, 0.25);
+
+    /* Card de vidro */
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.12);
+}
+
+/* ===================================================
+   2. RESET E ESTILOS GERAIS
+   =================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    /* Fundo com iluminação radial suave em tom cinza prata */
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(148, 163, 184, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(30, 41, 59, 0.3) 0%, transparent 60%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    color: #ffffff;
+}
+
+.container {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ===================================================
+   3. LOGO
+   =================================================== */
+.logo-wrapper {
+    text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.logo-wrapper img {
+    max-width: 200px;
+    height: auto;
+    filter: drop-shadow(0px 8px 16px rgba(255, 255, 255, 0.15));
+    transition: transform 0.4s ease;
+}
+
+.logo-wrapper img:hover {
+    transform: scale(1.04);
+}
+
+/* ===================================================
+   4. CABEÇALHO / TEXTO 1
+   =================================================== */
+.header-card {
+    text-align: left;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.6s ease-out both;
+}
+
+.badge-step {
+    display: inline-block;
+    background: var(--gray-grad);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px var(--gray-glow);
+}
+
+.header-card h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.header-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.header-card .sub-text {
+    margin-top: 10px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* ===================================================
+   5. DEPARTAMENTOS (TEXTO 2)
+   =================================================== */
+.departments-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.departments-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.dept-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    animation: slideUp 0.6s ease-out both;
+}
+
+.dept-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(203, 213, 225, 0.4);
+    box-shadow: 0 8px 25px rgba(148, 163, 184, 0.15);
+}
+
+.dept-number {
+    background: rgba(148, 163, 184, 0.15);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    font-size: 0.85rem;
+    font-weight: 800;
+    min-width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dept-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dept-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.dept-leader {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+
+.dept-leader b {
+    color: #f1f5f9;
+}
+
+.dept-desc {
+    font-size: 0.88rem;
+    color: #94a3b8;
+    line-height: 1.5;
+    margin-top: 2px;
+}
+
+/* ===================================================
+   6. LINK DE VOLTAR
+   =================================================== */
+.back-link-wrapper {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.back-link {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #e2e8f0;
+}
+
+/* ===================================================
+   7. ANIMAÇÕES & RESPONSIVIDADE
+   =================================================== */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    .header-card h1 {
+        font-size: 1.6rem;
+    }
+    .dept-card {
+        padding: 14px 16px;
+    }
+}

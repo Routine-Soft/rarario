@@ -1,0 +1,221 @@
+/* ===================================================
+   1. VARIÁVEIS DE CORES (Paleta da Imagem)
+   =================================================== */
+:root {
+    --bg-dark: #0f1117;
+    
+    /* Cores dos Passos (Degradês + Brilhos) */
+    --orange-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --orange-glow: rgba(249, 115, 22, 0.35);
+
+    --green-grad: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    --green-glow: rgba(22, 163, 74, 0.35);
+
+    --red-grad: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    --red-glow: rgba(220, 38, 38, 0.35);
+
+    --dark-grad: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    --dark-glow: rgba(51, 65, 85, 0.35);
+}
+
+/* ===================================================
+   2. RESET E ESTILOS GERAIS DE FUNDO
+   =================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #0d0f14;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 100%, rgba(249, 115, 22, 0.08) 0%, transparent 50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    color: #ffffff;
+}
+
+.container {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ===================================================
+   3. ESTILIZAÇÃO DA LOGO
+   =================================================== */
+.logo-wrapper {
+    text-align: center;
+    margin-bottom: 10px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.logo-wrapper img {
+    max-width: 220px;
+    height: auto;
+    filter: drop-shadow(0px 8px 16px rgba(255, 255, 255, 0.15));
+    transition: transform 0.4s ease;
+}
+
+.logo-wrapper img:hover {
+    transform: scale(1.04);
+}
+
+/* ===================================================
+   4. ESTILO DOS CARDS
+   =================================================== */
+.card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-radius: 50px;
+    color: #ffffff;
+    text-decoration: none;
+    overflow: hidden;
+    cursor: pointer;
+    
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: slideUp 0.6s ease-out cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Efeito de brilho que passa pelo card */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.25), 
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+.card:hover::before {
+    left: 100%;
+}
+
+.card:hover {
+    transform: translateY(-6px) scale(1.02);
+}
+
+/* Cores Específicas por Card */
+.card-conversao {
+    background: var(--orange-grad);
+    box-shadow: 0 10px 25px var(--orange-glow);
+    animation-delay: 0.1s;
+}
+
+.card-avancai {
+    background: var(--green-grad);
+    box-shadow: 0 10px 25px var(--green-glow);
+    animation-delay: 0.2s;
+}
+
+.card-cura {
+    background: var(--red-grad);
+    box-shadow: 0 10px 25px var(--red-glow);
+    animation-delay: 0.3s;
+}
+
+.card-atuacao {
+    background: var(--dark-grad);
+    box-shadow: 0 10px 25px var(--dark-glow);
+    animation-delay: 0.4s;
+}
+
+/* Conteúdo Interno do Card */
+.card-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 1;
+}
+
+.card-icon {
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    backdrop-filter: blur(4px);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Badge (Passo 01, 02...) */
+.step-badge {
+    background: rgba(0, 0, 0, 0.35);
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1;
+}
+
+.step-badge span {
+    font-weight: 800;
+    font-size: 1rem;
+    margin-left: 4px;
+}
+
+/* ===================================================
+   5. ANIMAÇÕES
+   =================================================== */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 480px) {
+    .card {
+        padding: 14px 18px;
+    }
+    .card-title {
+        font-size: 1.1rem;
+    }
+    .step-badge {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+    }
+}

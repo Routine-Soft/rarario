@@ -1,0 +1,272 @@
+/* ===================================================
+   1. VARIÁVEIS DE CORES (Baseadas na Paleta Principal)
+   =================================================== */
+:root {
+    --bg-dark: #0d0f14;
+    
+    /* Degradês Laranja (Tema da Conversão - Passo 01) */
+    --orange-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --orange-glow: rgba(249, 115, 22, 0.35);
+
+    /* Degradês Escuros / Contraste */
+    --dark-grad: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    --dark-glow: rgba(51, 65, 85, 0.35);
+
+    /* Card de vidro */
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.12);
+}
+
+/* ===================================================
+   2. RESET E ESTILOS GERAIS
+   =================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    /* Fundo com iluminação radial suave em laranja */
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(37, 99, 235, 0.08) 0%, transparent 60%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    color: #ffffff;
+}
+
+.container {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ===================================================
+   3. LOGO
+   =================================================== */
+.logo-wrapper {
+    text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.logo-wrapper img {
+    max-width: 200px;
+    height: auto;
+    filter: drop-shadow(0px 8px 16px rgba(255, 255, 255, 0.15));
+    transition: transform 0.4s ease;
+}
+
+.logo-wrapper img:hover {
+    transform: scale(1.04);
+}
+
+/* ===================================================
+   4. CABEÇALHO / TEXTO 1
+   =================================================== */
+.header-card {
+    text-align: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.6s ease-out both;
+}
+
+.badge-step {
+    display: inline-block;
+    background: var(--orange-grad);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px var(--orange-glow);
+}
+
+.header-card h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.header-card p {
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.header-card strong {
+    color: #f97316;
+}
+
+/* ===================================================
+   5. CARDS DE CONTEÚDO (Texto 2, 3 e 4)
+   =================================================== */
+.card-section {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    animation: slideUp 0.6s ease-out both;
+}
+
+.card-section:nth-child(2) { animation-delay: 0.1s; }
+.card-section:nth-child(3) { animation-delay: 0.2s; }
+.card-section:nth-child(4) { animation-delay: 0.3s; }
+
+.card-section:hover {
+    transform: translateY(-4px);
+    border-color: rgba(249, 115, 22, 0.4);
+}
+
+.card-section h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-section p {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #94a3b8;
+}
+
+.card-section em {
+    color: #cbd5e1;
+    font-style: italic;
+}
+
+/* ===================================================
+   6. BOTÕES COM DEGRADÊ E EFEITO HOVER
+   =================================================== */
+.btn {
+    display: inline-block;
+    text-align: center;
+    padding: 14px 24px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-top: 6px;
+}
+
+.btn-orange {
+    background: var(--orange-grad);
+    box-shadow: 0 6px 20px var(--orange-glow);
+}
+
+.btn-orange:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.5);
+}
+
+.btn-dark {
+    background: var(--dark-grad);
+    box-shadow: 0 6px 20px var(--dark-glow);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-dark:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(51, 65, 85, 0.5);
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+}
+
+/* Efeito de brilho que passa no botão ao passar o mouse */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+/* ===================================================
+   7. LINK DE VOLTAR
+   =================================================== */
+.back-link-wrapper {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.back-link {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #f97316;
+}
+
+/* ===================================================
+   8. ANIMAÇÕES
+   =================================================== */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    .header-card h1 {
+        font-size: 1.6rem;
+    }
+    .card-section h2 {
+        font-size: 1.15rem;
+    }
+    .btn {
+        font-size: 0.88rem;
+        padding: 12px 18px;
+    }
+}
