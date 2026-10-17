@@ -141,9 +141,9 @@ body {
    =================================================== */
 .qr-stage {
     position: relative;
-    width: 170mm;
-    height: 170mm;
-    max-width: 85%;
+    width: 200mm;
+    height: 200mm;
+    max-width: 95%;
 }
 
 .qr-stage img {
@@ -175,21 +175,24 @@ body {
     height: 7mm;
 }
 
+/* As marcas ficam por cima da margem branca (quiet zone) do próprio QR Code,
+   nunca para fora dele — assim, mesmo com o QR quase encostando na borda da
+   folha, a marca não é cortada/some na impressão. */
 .crop-mark--tl { top: 0; left: 0; }
-.crop-mark--tl::before { top: 0; left: -9mm; }
-.crop-mark--tl::after { top: -9mm; left: 0; }
+.crop-mark--tl::before { top: 0; left: 0; }
+.crop-mark--tl::after { top: 0; left: 0; }
 
 .crop-mark--tr { top: 0; right: 0; }
-.crop-mark--tr::before { top: 0; right: -9mm; }
-.crop-mark--tr::after { top: -9mm; right: 0; }
+.crop-mark--tr::before { top: 0; right: 0; }
+.crop-mark--tr::after { top: 0; right: 0; }
 
 .crop-mark--bl { bottom: 0; left: 0; }
-.crop-mark--bl::before { bottom: 0; left: -9mm; }
-.crop-mark--bl::after { bottom: -9mm; left: 0; }
+.crop-mark--bl::before { bottom: 0; left: 0; }
+.crop-mark--bl::after { bottom: 0; left: 0; }
 
 .crop-mark--br { bottom: 0; right: 0; }
-.crop-mark--br::before { bottom: 0; right: -9mm; }
-.crop-mark--br::after { bottom: -9mm; right: 0; }
+.crop-mark--br::before { bottom: 0; right: 0; }
+.crop-mark--br::after { bottom: 0; right: 0; }
 
 /* ===================================================
    5. ANIMAÇÕES
