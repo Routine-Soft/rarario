@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code - Comunhão RARA RIO</title>
+
+    <!-- Fonte Google Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Link para o arquivo CSS externo -->
+    <link rel="stylesheet" href="../css/qrcode.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Logo e instruções (não imprimem) -->
+        <div class="logo-wrapper no-print">
+            <a href="../index.html">
+                <img src="../img/logo-rarario-transparente.webp" alt="Logo">
+            </a>
+        </div>
+
+        <header class="header-card no-print">
+            <h1>QR Code do site</h1>
+            <p>Esse QR Code abre <b>rarario.vercel.app</b>. Ele foi gerado com correção de erro alta, então continua funcionando mesmo com a logo no meio, em formato vetorial (SVG) — não perde qualidade nem ao imprimir bem grande.</p>
+            <p>Para imprimir: aperte o botão abaixo (ou Ctrl+P / Cmd+P), escolha a folha <b>A4</b>, margens <b>nenhuma/mínimas</b> e desmarque qualquer opção de "ajustar à página" (escala 100%). Depois é só recortar pelas marquinhas nos quatro cantos.</p>
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir QR Code</button>
+        </header>
+
+        <!-- Folha A4 com o QR Code centralizado -->
+        <div class="a4-sheet">
+            <div class="qr-stage">
+                <span class="crop-mark crop-mark--tl"></span>
+                <span class="crop-mark crop-mark--tr"></span>
+                <span class="crop-mark crop-mark--bl"></span>
+                <span class="crop-mark crop-mark--br"></span>
+                <img src="../img/qrcode-rarario.svg" alt="QR Code para rarario.vercel.app">
+            </div>
+        </div>
+
+        <!-- Botão para voltar para a Home -->
+        <div class="back-link-wrapper no-print">
+            <a href="../index.html" class="back-link">← Voltar para a Página Inicial</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

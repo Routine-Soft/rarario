@@ -1,0 +1,239 @@
+/* ===================================================
+   1. VARIÁVEIS DE CORES (Tema Vermelho - mesmo padrão do site)
+   =================================================== */
+:root {
+    --bg-dark: #0d0f14;
+    --red-grad: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    --red-glow: rgba(220, 38, 38, 0.35);
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.12);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    background-image:
+        radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.18) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(37, 99, 235, 0.08) 0%, transparent 60%);
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #ffffff;
+}
+
+.container {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+/* ===================================================
+   2. LOGO E INSTRUÇÕES (só aparecem na tela, não imprimem)
+   =================================================== */
+.logo-wrapper {
+    text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.logo-wrapper img {
+    max-width: 180px;
+    height: auto;
+    filter: drop-shadow(0px 8px 16px rgba(255, 255, 255, 0.15));
+}
+
+.header-card {
+    width: 100%;
+    text-align: left;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.header-card h1 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.header-card p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+}
+
+.header-card b {
+    color: #ef4444;
+}
+
+.btn-print {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px 20px;
+    background: var(--red-grad);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--red-glow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-print:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px var(--red-glow);
+}
+
+.back-link-wrapper {
+    text-align: center;
+}
+
+.back-link {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #ef4444;
+}
+
+/* ===================================================
+   3. FOLHA A4 (pré-visualização na tela)
+   =================================================== */
+.a4-sheet {
+    width: 210mm;
+    height: 297mm;
+    max-width: 100%;
+    aspect-ratio: 210 / 297;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===================================================
+   4. QR CODE + MARCAS DE CORTE
+   =================================================== */
+.qr-stage {
+    position: relative;
+    width: 170mm;
+    height: 170mm;
+    max-width: 85%;
+}
+
+.qr-stage img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.crop-mark {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.crop-mark::before,
+.crop-mark::after {
+    content: "";
+    position: absolute;
+    background: #000000;
+}
+
+.crop-mark::before {
+    width: 7mm;
+    height: 0.3mm;
+}
+
+.crop-mark::after {
+    width: 0.3mm;
+    height: 7mm;
+}
+
+.crop-mark--tl { top: 0; left: 0; }
+.crop-mark--tl::before { top: 0; left: -9mm; }
+.crop-mark--tl::after { top: -9mm; left: 0; }
+
+.crop-mark--tr { top: 0; right: 0; }
+.crop-mark--tr::before { top: 0; right: -9mm; }
+.crop-mark--tr::after { top: -9mm; right: 0; }
+
+.crop-mark--bl { bottom: 0; left: 0; }
+.crop-mark--bl::before { bottom: 0; left: -9mm; }
+.crop-mark--bl::after { bottom: -9mm; left: 0; }
+
+.crop-mark--br { bottom: 0; right: 0; }
+.crop-mark--br::before { bottom: 0; right: -9mm; }
+.crop-mark--br::after { bottom: -9mm; right: 0; }
+
+/* ===================================================
+   5. ANIMAÇÕES
+   =================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ===================================================
+   6. IMPRESSÃO
+   =================================================== */
+@media print {
+    @page {
+        size: A4;
+        margin: 0;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff !important;
+        padding: 0;
+        color: #000000;
+    }
+
+    .container {
+        max-width: none;
+        gap: 0;
+    }
+
+    .a4-sheet {
+        width: 210mm;
+        height: 297mm;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-card h1 {
+        font-size: 1.2rem;
+    }
+}
