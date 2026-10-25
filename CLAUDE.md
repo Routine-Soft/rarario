@@ -20,6 +20,13 @@ Toda página nova segue o molde de `pages/curadaalma.html` / `css/curadaalma.css
 - Botões de contato usam **WhatsApp** (`https://wa.me/55<DDD><número>?text=...`), nunca `tel:`, com mensagem pré-pronta em português (texto URL-encoded) e `target="_blank" rel="noopener"`.
 - Números de telefone: copiar exatamente os dígitos que o Stanley manda. Nunca completar/arredondar um número que pareça "faltando um dígito" — pode ser assim mesmo (já aconteceu de eu inventar um dígito a mais por engano).
 
+## Painéis do Aluno e do Professor (`pages/painel-aluno.html`, `pages/painel-professor.html`)
+
+- Sem backend próprio: consomem a API do **rara-backend** (a mesma do raraapp, `https://rara.cestsegtrabalho.com.br/api`, definida em `js/shared/httpClient.js`). Login com a conta do app; nenhum segredo do `.env` vai para cá (o site é público).
+- JavaScript puro em ES modules, sem build: `js/shared/` (httpClient, sessão, tema, login/topo em `painel.js`, peças de tela em `ui.js`), `js/user/user.api.js`, `js/lesson/` (`lesson.api.js`, `lesson.utils.js`) e um arquivo por painel (`js/painel-*.js`). Os dois painéis dividem `css/painel.css`.
+- Cor de destaque: violeta. Temas escuro (padrão), claro, rosa e "sistema", escolhidos no topo.
+- Professor = cargos do "Avançai Liderança" do app (`super_admin`, `pastor_local`, `secretaria_igreja`, `avancai_lider`, `avancai_equipe`). As regras de verdade ficam no backend; o site só espelha o que o app faz (`lib/components/lesson/` no raraapp).
+
 ## QR Codes (`pages/qrcode.html` e `pages/qrcode-christiangroup.html`)
 
 - Gerados por um script Python (lib `qrcode` + `Pillow`, roda fora do repo, não fica versionado) com **correção de erro alta** (`ERROR_CORRECT_H`), exportado como **SVG vetorial** (não pixeliza ao imprimir grande), salvo em `img/qrcode-*.svg`. A logo da RARA fica num selo com degradê vermelho no centro, ocupando só uma fração pequena da área (dentro do orçamento de ~30% que o nível H tolera).
