@@ -23,7 +23,10 @@ Toda página nova segue o molde de `pages/curadaalma.html` / `css/curadaalma.css
 ## Painéis do Aluno e do Professor (`pages/painel-aluno.html`, `pages/painel-professor.html`)
 
 - Sem backend próprio: consomem a API do **rara-backend** (a mesma do raraapp, `https://rara.cestsegtrabalho.com.br/api`, definida em `js/shared/httpClient.js`). Login com a conta do app; nenhum segredo do `.env` vai para cá (o site é público).
-- JavaScript puro em ES modules, sem build: `js/shared/` (httpClient, sessão, tema, login/topo em `painel.js`, peças de tela em `ui.js`), `js/user/user.api.js`, `js/lesson/` (`lesson.api.js`, `lesson.utils.js`) e um arquivo por painel (`js/painel-*.js`). Os dois painéis dividem `css/painel.css`.
+- JavaScript puro em ES modules, sem build: `js/shared/` (httpClient, sessão, tema, topo em `topo.js`, estrutura do painel em `painel.js`, caminho login→painel em `auth.js`, botão do Google em `google.js`, peças de tela em `ui.js`), `js/user/user.api.js`, `js/lesson/` (`lesson.api.js`, `lesson.utils.js`), `js/gift/` (Testes dos Dons) e um arquivo por página (`js/painel-*.js`, `js/entrar.js`, `js/login.js`, `js/criar-conta.js`). Todas dividem `css/painel.css`.
+- Acesso (espelha o app): painel sem login manda para `pages/entrar.html?voltar=<painel>` (Entrar / Continuar com Google / Criar conta), que volta para o painel depois. Conta sem igreja (nova pelo Google) passa antes por `criar-conta.html?completar=1`.
+- Google: Google Identity Services com o client ID "Aplicativo da Web" do raraapp (o backend já aceita em `GOOGLE_CLIENT_IDS`). Cada domínio do site precisa estar em "Origens JavaScript autorizadas" desse client no Google Cloud.
+- Trilha do aluno = aulas + os 2 Testes dos Dons (por último, contam no total). Batizado não faz o RESET: o módulo some e sai do total (`modulesFor`/`lessonsFor` em `lesson.utils.js`; no app, `byModule(baptized:)`).
 - Cor de destaque: violeta. Temas escuro (padrão), claro, rosa e "sistema", escolhidos no topo.
 - Professor = cargos do "Avançai Liderança" do app (`super_admin`, `pastor_local`, `secretaria_igreja`, `avancai_lider`, `avancai_equipe`). As regras de verdade ficam no backend; o site só espelha o que o app faz (`lib/components/lesson/` no raraapp).
 

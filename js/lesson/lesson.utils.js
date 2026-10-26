@@ -13,6 +13,14 @@ const MODULE_LABELS = {
 
 export const moduleLabel = (module) => MODULE_LABELS[module] ?? String(module).toUpperCase()
 
+// Quem é batizado não faz o RESET: o módulo some da trilha e do total
+export const modulesFor = (user) => LESSON_MODULES.filter((m) => !(user?.baptized && m === 'reset'))
+
+export const lessonsFor = (lessons, user) => {
+    const modules = modulesFor(user)
+    return lessons.filter((l) => modules.includes(l.module))
+}
+
 // { historia: [aulas...], reset: [...], ... } na ordem dos módulos e das aulas
 export function groupByModule(lessons) {
     const groups = Object.fromEntries(LESSON_MODULES.map((m) => [m, []]))

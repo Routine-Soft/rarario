@@ -4,7 +4,8 @@
 import { mountPanel } from './shared/painel.js'
 import { lessonApi } from './lesson/lesson.api.js'
 import { userApi, isTeacher, isSuperAdmin } from './user/user.api.js'
-import { LESSON_MODULES, moduleLabel, groupByModule, refId } from './lesson/lesson.utils.js'
+import { LESSON_MODULES, modulesFor, lessonsFor, moduleLabel, groupByModule, refId } from './lesson/lesson.utils.js'
+import { giftTestApi, resultOf, bestGifts } from './gift/gift.api.js'
 import {
     escapeHtml, toast, skeletons, emptyState, progressBar, fillProgress, openSheet,
     formatDate, initials, toDateInput, fromDateInput,
@@ -21,6 +22,7 @@ function renderProfessor(main, me) {
     let users = []
     let lessons = []
     let progresses = []
+    let tests = [] // Testes dos Dons (contam no total, junto com as aulas)
     let tab = 'alunos' // 'alunos' | 'membros'
     let search = ''
     let churchId = me.churchId ?? ''
@@ -53,6 +55,14 @@ function renderProfessor(main, me) {
     const lista = main.querySelector('#lista')
 
     const lessonsDone = (userId) => progresses.filter((p) => refId(p.userId) === userId)
+
+    // Trilha de cada aluno: aulas que ele faz (batizado não faz o RESET) + testes
+    function journey(user) {
+        const visible = new Set(lessonsFor(lessons, user).map((l) => l._id))
+        const doneLessons = lessonsDone(user._id).filter((p) => visible.has(refId(p.lessonId))).length
+        const doneTests = tests.filter((t) => resultOf(user, t.key)).length
+        return { done: doneLessons + doneTests, total: visible.size + tests.length }
+    }
 
     main.querySelectorAll('[data-tab]').forEach((button) => {
         button.addEventListener('click', () => {
@@ -88,11 +98,14 @@ function renderProfessor(main, me) {
 
     async function load() {
         try {
-            ;[users, lessons, progresses] = await Promise.all([
+            let catalog
+            ;[users, lessons, progresses, catalog] = await Promise.all([
                 userApi.getAll(isSuperAdmin(me) ? churchId : undefined),
                 lessonApi.getAll(),
                 lessonApi.getAllProgress(),
+                giftTestApi.getCatalog(),
             ])
+            tests = catalog.tests ?? []
             drawAll()
         } catch (error) {
             showError(error)
@@ -154,6 +167,7 @@ function renderProfessor(main, me) {
 
         lista.innerHTML = filtered.map((user, i) => {
             const done = lessonsDone(user._id).length
+            const trilha = journey(user)
             return `
                 <button type="button" class="card person" data-user="${user._id}" style="animation-delay:${Math.min(i, 8) * 50}ms">
                     <span class="avatar" aria-hidden="true">${escapeHtml(initials(user.name))}</span>
@@ -169,7 +183,7 @@ function renderProfessor(main, me) {
                             <span class="tag">🤝 ${escapeHtml(user.facilitator || 'Sem facilitador')}</span>
                             <span class="tag tag-accent">📖 ${done} ${done === 1 ? 'aula' : 'aulas'}</span>
                         </span>
-                        ${lessons.length ? progressBar('Progresso', Math.min(done, lessons.length), lessons.length) : ''}
+                        ${trilha.total ? progressBar('Progresso', trilha.done, trilha.total) : ''}
                     </span>
                 </button>`
         }).join('')
@@ -220,12 +234,33 @@ function renderProfessor(main, me) {
 
                 <div class="section-title">📊 Progresso por módulo</div>
                 <div class="box">
-                    ${LESSON_MODULES.filter((m) => groups[m]?.length).map((m) => progressBar(
+                    ${modulesFor(user).filter((m) => groups[m]?.length).map((m) => progressBar(
                         moduleLabel(m),
                         (groups[m] ?? []).filter((l) => doneIds.has(l._id)).length,
                         (groups[m] ?? []).length,
                     )).join('')}
+                    ${tests.length ? progressBar(
+                        'TESTES DE DONS',
+                        tests.filter((t) => resultOf(user, t.key)).length,
+                        tests.length,
+                    ) : ''}
                 </div>
+                ${user.baptized && groups.reset?.length ? '<p class="muted">💧 Batizado: não precisa fazer o RESET.</p>' : ''}
+
+                ${tests.length ? `
+                    <div class="section-title">🎁 Testes de dons</div>
+                    <div class="box">
+                        <ul class="score-list">
+                            ${tests.map((t) => {
+                                const result = resultOf(user, t.key)
+                                return `
+                                    <li>
+                                        <span>${escapeHtml(t.title)}</span>
+                                        <b class="wrap">${result ? `⭐ ${escapeHtml(bestGifts(result))}` : 'Não fez'}</b>
+                                    </li>`
+                            }).join('')}
+                        </ul>
+                    </div>` : ''}
 
                 ${done.length ? `
                     <div class="section-title">✅ Aulas feitas</div>

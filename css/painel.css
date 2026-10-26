@@ -799,6 +799,157 @@ dialog.sheet::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4
 .back-link:hover { color: var(--accent); }
 
 /* ===================================================
+   TELAS DE ACESSO (entrar, login, criar conta)
+   =================================================== */
+.auth-card { padding: 32px 24px; gap: 16px; text-align: center; align-items: stretch; }
+.auth-wide, .auth-card .field, .auth-card .alert { text-align: left; }
+.auth-wide .gradient-text, .auth-wide .auth-sub { text-align: center; }
+
+/* Logo é clara: selo com degradê por trás para aparecer em todos os temas */
+.auth-logo {
+    width: 112px;
+    height: 112px;
+    align-self: center;
+    padding: 18px;
+    border-radius: 30px;
+    background: #14161d;
+    box-shadow: 0 12px 32px var(--violet-glow);
+    object-fit: contain;
+}
+.auth-logo-sm { width: 76px; height: 76px; padding: 12px; border-radius: 22px; }
+
+.auth-hello { color: var(--text-soft); font-weight: 600; margin-top: 4px; }
+.auth-sub { color: var(--text-soft); font-size: 0.95rem; line-height: 1.5; }
+.auth-foot { color: var(--text-muted); font-size: 0.9rem; text-align: center; }
+.auth-foot a { font-weight: 700; text-decoration: none; }
+
+.gradient-text {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    background: var(--violet-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.btn-lg { min-height: 54px; font-size: 1rem; border-radius: 16px; }
+.auth-card .btn-link { align-self: flex-end; }
+
+.or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+
+.google-area { display: flex; flex-direction: column; gap: 16px; }
+.google-box { min-height: 44px; display: flex; justify-content: center; transition: opacity 0.2s ease; }
+.google-box.loading { opacity: 0.5; pointer-events: none; }
+
+/* Formulário em seções */
+.form-section {
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: var(--glass-bg);
+}
+.form-section legend { padding: 0 8px; font-weight: 700; font-size: 0.95rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field-label { font-size: 0.85rem; font-weight: 600; color: var(--text-soft); }
+.field-hint { font-size: 0.8rem; color: var(--text-muted); min-height: 1em; }
+select.input { appearance: auto; }
+select.input option { background: var(--dialog-bg); color: var(--text); }
+
+.check {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border);
+    background: var(--input-bg);
+    cursor: pointer;
+}
+.check input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+.check strong { display: block; font-size: 0.95rem; }
+.check small { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; }
+.check:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; cursor: pointer; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--input-bg);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.chip input:checked + span { background: var(--violet-grad); border-color: transparent; color: #fff; }
+.chip input:focus-visible + span { box-shadow: 0 0 0 3px var(--accent-soft); }
+
+.floating { animation: floating 4s ease-in-out infinite; }
+.reveal { animation: slideUp 0.5s ease-out both; animation-delay: calc(var(--i, 0) * 70ms); }
+.floating.reveal { animation: slideUp 0.5s ease-out both, floating 4s ease-in-out 0.6s infinite; }
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* ===================================================
+   TESTES DOS DONS
+   =================================================== */
+.muted { color: var(--text-muted); font-size: 0.85rem; }
+.score-list li b.wrap { white-space: normal; text-align: right; }
+
+.quiz-question { font-size: 1.2rem; font-weight: 700; line-height: 1.45; outline: none; animation: fadeIn 0.25s ease-out; }
+.quiz-answers { display: flex; flex-direction: column; gap: 10px; }
+.quiz-answer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 56px;
+    padding: 10px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-strong);
+    font-weight: 600;
+    text-align: left;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.quiz-answer:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+.quiz-answer:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--accent-soft); border-color: var(--accent); }
+.quiz-emoji { font-size: 1.6rem; }
+
+.quiz-sending { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 32px; color: var(--text-soft); font-weight: 600; }
+.spinner {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 3px solid var(--accent-soft);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.quiz-result-title { font-size: 1.15rem; font-weight: 800; }
+.gift-scores { gap: 14px; }
+.gift-score .progress-head strong { font-weight: 600; }
+.gift-score.best .progress-head strong { font-weight: 800; color: var(--accent); }
+
+/* ===================================================
    CELULAR
    =================================================== */
 @media (max-width: 600px) {
@@ -807,6 +958,9 @@ dialog.sheet::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4
     .hero h1 { font-size: 1.35rem; }
     .stat strong { font-size: 1.25rem; }
     .theme-select { max-width: 110px; }
+    .auth-card { padding: 24px 16px; }
+    .form-section { padding: 16px 14px; }
+    .gradient-text { font-size: 1.7rem; }
 
     dialog.sheet {
         width: 100%;

@@ -1,13 +1,17 @@
 // Painel do Aluno: aulas do Avançai agrupadas por módulo, com os acertos de
-// cada uma; abre a aula para estudar e responder (espelha lesson_page.dart).
+// cada uma, e por último os Testes dos Dons; abre a aula para estudar e
+// responder (espelha lesson_page.dart). Batizado não vê o RESET.
 import { mountPanel } from './shared/painel.js'
+import { updateSession } from './shared/session.js'
 import { lessonApi } from './lesson/lesson.api.js'
+import { giftTestApi, resultOf, bestGifts } from './gift/gift.api.js'
+import { openGiftTest } from './gift/gift.sheet.js'
 import {
-    LESSON_MODULES, moduleLabel, groupByModule, refId, optionLetter,
+    modulesFor, lessonsFor, moduleLabel, groupByModule, refId, optionLetter,
     lessonSubtitle, lessonContentHtml, bindVideo,
 } from './lesson/lesson.utils.js'
 import {
-    escapeHtml, toast, skeletons, emptyState, progressBar, fillProgress, openSheet,
+    escapeHtml, toast, skeletons, emptyState, progressBar, fillProgress, openSheet, formatDate,
 } from './shared/ui.js'
 
 mountPanel({ title: 'Painel do Aluno', render: renderAluno })
@@ -15,6 +19,7 @@ mountPanel({ title: 'Painel do Aluno', render: renderAluno })
 function renderAluno(main, user) {
     let lessons = []
     let mine = [] // progresso do aluno logado
+    let catalog = { answers: [], tests: [] } // Testes dos Dons
 
     const firstName = escapeHtml(String(user.name ?? '').split(' ')[0])
     main.innerHTML = `
@@ -33,7 +38,11 @@ function renderAluno(main, user) {
 
     async function load() {
         try {
-            ;[lessons, mine] = await Promise.all([lessonApi.getAll(), lessonApi.getMyProgress()])
+            ;[lessons, mine, catalog] = await Promise.all([
+                lessonApi.getAll(),
+                lessonApi.getMyProgress(),
+                giftTestApi.getCatalog(),
+            ])
             draw()
         } catch (error) {
             geral.innerHTML = ''
@@ -50,12 +59,17 @@ function renderAluno(main, user) {
     }
 
     function draw() {
-        const groups = groupByModule(lessons)
-        const done = lessons.filter((l) => progressOf(l._id)).length
-        geral.innerHTML = lessons.length ? progressBar('Seu progresso', done, lessons.length) : ''
+        const visible = lessonsFor(lessons, user)
+        const groups = groupByModule(visible)
+        const tests = catalog.tests ?? []
+        const testsDone = tests.filter((t) => resultOf(user, t.key)).length
+        // Os testes dos dons contam no total, junto com as aulas
+        const total = visible.length + tests.length
+        const done = visible.filter((l) => progressOf(l._id)).length + testsDone
+        geral.innerHTML = total ? progressBar('Seu progresso', done, total) : ''
 
-        const filled = LESSON_MODULES.filter((m) => groups[m]?.length)
-        if (!filled.length) {
+        const filled = modulesFor(user).filter((m) => groups[m]?.length)
+        if (!filled.length && !tests.length) {
             modulos.innerHTML = emptyState({ icon: '📚', message: 'Nenhuma aula disponível ainda. Volte em breve!' })
             return
         }
@@ -77,8 +91,32 @@ function renderAluno(main, user) {
                         ${list.map(lessonItem).join('')}
                     </ul>
                 </details>`
-        }).join('')
+        }).join('') + (tests.length ? `
+                <details class="card module" data-module="dons" ${abertos.has('dons') ? 'open' : ''}
+                    style="animation-delay:${filled.length * 60}ms">
+                    <summary>
+                        ${progressBar('TESTES DE DONS', testsDone, tests.length)}
+                        <span class="chevron" aria-hidden="true">❯</span>
+                    </summary>
+                    <ul class="lesson-list">
+                        ${tests.map(testItem).join('')}
+                    </ul>
+                </details>` : '')
 
+        modulos.querySelectorAll('[data-test]').forEach((button) => {
+            button.addEventListener('click', () => {
+                openGiftTest({
+                    test: tests.find((t) => t.key === button.dataset.test),
+                    answers: catalog.answers,
+                    user,
+                    onSaved: (updated) => {
+                        user = updated
+                        updateSession({ user: updated })
+                        draw()
+                    },
+                })
+            })
+        })
         modulos.querySelectorAll('[data-lesson]').forEach((button) => {
             button.addEventListener('click', () => {
                 openStudy(lessons.find((l) => l._id === button.dataset.lesson))
@@ -98,6 +136,23 @@ function renderAluno(main, user) {
                         <span>${progress
                             ? `Acertos: ${progress.score}/${progress.totalQuestions}`
                             : `Aula ${lesson.number} • não iniciada`}</span>
+                    </span>
+                    <span class="chevron" aria-hidden="true">❯</span>
+                </button>
+            </li>`
+    }
+
+    function testItem(test, i) {
+        const result = resultOf(user, test.key)
+        return `
+            <li>
+                <button type="button" class="lesson-item ${result ? 'done' : ''}" data-test="${test.key}">
+                    <span class="lesson-num" aria-hidden="true">${result ? '✓' : i + 1}</span>
+                    <span class="lesson-info">
+                        <strong>${escapeHtml(test.title)}</strong>
+                        <span>${result
+                            ? `Mais forte: ${escapeHtml(bestGifts(result))} • ${formatDate(result.completedAt)}`
+                            : `${test.questions.length} perguntas • não iniciado`}</span>
                     </span>
                     <span class="chevron" aria-hidden="true">❯</span>
                 </button>
