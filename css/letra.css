@@ -1,0 +1,101 @@
+/* ===================================================
+   TAMANHO DA LETRA — botão "Aa" flutuante (js/shared/letra.js)
+   Usa os tokens dos painéis quando existem; nas outras páginas
+   (sempre escuras) cai no vidro fosco escuro padrão do site.
+   Medidas em px de propósito: o controle não cresce junto com a letra.
+   =================================================== */
+.letra {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.letra-abrir,
+.letra-painel {
+    background: var(--dialog-bg, rgba(21, 24, 33, 0.85));
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14));
+    color: var(--text, #ffffff);
+    box-shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.35));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.letra-abrir {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font: 700 17px/1 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.letra-abrir:hover { transform: scale(1.06); }
+
+.letra-painel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 18px;
+    animation: letraSurgir 0.18s ease-out;
+}
+
+.letra-painel[hidden] { display: none; }
+
+.letra-btn,
+.letra-pct {
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14));
+    background: var(--glass-bg, rgba(255, 255, 255, 0.05));
+    color: inherit;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.letra-btn {
+    width: 42px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.letra-btn-grande { font-size: 20px; }
+.letra-btn small { font-size: 12px; margin-left: 1px; }
+
+.letra-pct {
+    min-width: 64px;
+    padding: 0 10px;
+    border-color: transparent;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.letra-btn:disabled { opacity: 0.35; cursor: default; }
+
+.letra-abrir:focus-visible,
+.letra-btn:focus-visible,
+.letra-pct:focus-visible {
+    outline: 2px solid var(--accent, #a78bfa);
+    outline-offset: 2px;
+}
+
+@keyframes letraSurgir {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .letra-painel { animation: none; }
+    .letra-abrir { transition: none; }
+}
+
+@media print {
+    .letra { display: none; }
+}
