@@ -135,6 +135,13 @@ function render(user) {
     bindTopbar(app, voltarAoInicio)
     form.querySelector('#sair-cadastro')?.addEventListener('click', voltarAoInicio)
     bindPasswordEyes(form)
+    // "Nenhum" não se mistura com os outros cargos
+    form.querySelectorAll('input[name="cargo"]').forEach((caixa) => caixa.addEventListener('change', () => {
+        if (!caixa.checked) return
+        form.querySelectorAll('input[name="cargo"]:checked').forEach((outra) => {
+            if (outra !== caixa && (outra.value === 'nenhum' || caixa.value === 'nenhum')) outra.checked = false
+        })
+    }))
     preencherTelefone(user?.phone)
     preencherEndereco(user?.address)
     carregarIgrejas(user?.churchId)

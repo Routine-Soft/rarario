@@ -21,8 +21,9 @@ export const userApi = {
 
 export const GENDERS = ['Masculino', 'Feminino']
 
-// Cargos eclesiásticos — enum ECCLESIASTICAL_ROLES do backend
+// Cargos eclesiásticos — enum ECCLESIASTICAL_ROLES do backend ('nenhum' não se mistura com os outros)
 export const ECCLESIASTICAL_ROLES = [
+    ['nenhum', 'Nenhum'],
     ['pastor', 'Pastor(a)'],
     ['presbitero', 'Presbítero(a)'],
     ['apostolo', 'Apóstolo(a)'],
