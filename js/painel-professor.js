@@ -182,7 +182,7 @@ function renderProfessor(main, me) {
                             ${user.member ? '<span class="tag tag-success">🛡️ Membro</span>' : ''}
                             ${isAvancaiTeam(user) ? '<span class="tag tag-accent">👥 Equipe Avançai</span>' : ''}
                             ${user.status ? `<span class="tag ${user.status === 'Presente' ? 'tag-success' : 'tag-danger'}">${escapeHtml(user.status)}</span>` : ''}
-                            ${user.facilitator ? `<span class="tag">🤝 Facilita: ${escapeHtml(user.facilitator)}</span>` : ''}
+                            ${user.facilitator ? `<span class="tag">🤝 Facilitador: ${escapeHtml(user.facilitator)}</span>` : ''}
                             <span class="tag">💧 ${user.baptized ? 'Batizado' : 'Não batizado'}</span>
                             <span class="tag tag-accent">📖 ${done} ${done === 1 ? 'aula' : 'aulas'}</span>
                             ${user.phone ? phoneLink(user.phone) : ''}
