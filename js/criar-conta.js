@@ -4,11 +4,14 @@ import { topbar, bindTopbar } from './shared/topo.js'
 import { jaEntrou, entrou, seguir, sair, linkAcesso } from './shared/auth.js'
 import { getSession, updateSession } from './shared/session.js'
 import { userApi, normalizeEmail, GENDERS, ECCLESIASTICAL_ROLES, COUNTRIES } from './user/user.api.js'
+import { onSessionExpired } from './shared/httpClient.js'
 import { escapeHtml, bindPasswordEyes, passwordField, fromDateInput, toDateInput } from './shared/ui.js'
 
 const app = document.getElementById('app')
 const completar = new URLSearchParams(location.search).has('completar')
 const session = getSession()
+
+if (completar) onSessionExpired(() => location.replace(linkAcesso('entrar.html')))
 
 if (completar && !session?.accessToken) {
     location.replace(linkAcesso('entrar.html'))

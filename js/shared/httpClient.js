@@ -63,7 +63,8 @@ async function renovarToken() {
 export async function http(method, path, body) {
     let { response, json } = await enviar(method, path, body, getSession()?.accessToken)
 
-    if (response.status === 401 && getSession()?.refreshToken && !path.startsWith('/users/login')) {
+    // 401 fora do login: tenta renovar; se não der (ou nem há refreshToken), desloga
+    if (response.status === 401 && !path.startsWith('/users/login') && getSession()) {
         const novoToken = await renovarToken()
         if (novoToken) {
             ;({ response, json } = await enviar(method, path, body, novoToken))
