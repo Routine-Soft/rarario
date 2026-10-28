@@ -27,7 +27,7 @@ Toda página nova segue o molde de `pages/curadaalma.html` / `css/curadaalma.css
 - Acesso (espelha o app): painel sem login manda para `pages/entrar.html?voltar=<painel>` (Entrar / Continuar com Google / Criar conta), que volta para o painel depois. Conta sem igreja (nova pelo Google) passa antes por `criar-conta.html?completar=1`.
 - Google: Google Identity Services com o client ID "Aplicativo da Web" do raraapp (o backend já aceita em `GOOGLE_CLIENT_IDS`). Cada domínio do site precisa estar em "Origens JavaScript autorizadas" desse client no Google Cloud.
 - Trilha do aluno = aulas + os 2 Testes dos Dons (por último, contam no total). Batizado não faz o RESET: o módulo some e sai do total (`modulesFor`/`lessonsFor` em `lesson.utils.js`; no app, `byModule(baptized:)`).
-- Cor de destaque: violeta. Temas escuro (padrão), claro, rosa e "sistema", escolhidos no topo.
+- Cor de destaque: verde (o mesmo do Avançai, `#16a34a`). Temas escuro (padrão), claro, rosa e "sistema", escolhidos no topo.
 - Professor = cargos do "Avançai Liderança" do app (`super_admin`, `pastor_local`, `secretaria_igreja`, `avancai_lider`, `avancai_equipe`). As regras de verdade ficam no backend; o site só espelha o que o app faz (`lib/components/lesson/` no raraapp).
 
 ## QR Codes (`pages/qrcode.html` e `pages/qrcode-christiangroup.html`)
