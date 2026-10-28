@@ -1,9 +1,9 @@
 // Painel do Professor: alunos e membros da igreja com o progresso nas aulas
-// do Avançai; detalhe do aluno com "Tornar membro" (espelha
-// lesson_teacher_page.dart e student_detail_dialog.dart).
+// do Avançai; detalhe do aluno com "Tornar membro" e a equipe do Avançai
+// (espelha lesson_teacher_page.dart e student_detail_dialog.dart).
 import { mountPanel } from './shared/painel.js'
 import { lessonApi } from './lesson/lesson.api.js'
-import { userApi, isTeacher, isSuperAdmin } from './user/user.api.js'
+import { userApi, isTeacher, isSuperAdmin, canManageAvancaiTeam, isAvancaiTeam, whatsAppUrl } from './user/user.api.js'
 import { LESSON_MODULES, modulesFor, lessonsFor, moduleLabel, groupByModule, refId } from './lesson/lesson.utils.js'
 import { giftTestApi, resultOf, bestGifts } from './gift/gift.api.js'
 import {
@@ -168,8 +168,10 @@ function renderProfessor(main, me) {
         lista.innerHTML = filtered.map((user, i) => {
             const done = lessonsDone(user._id).length
             const trilha = journey(user)
+            // div (e não button): o telefone dentro do card é um link
             return `
-                <button type="button" class="card person" data-user="${user._id}" style="animation-delay:${Math.min(i, 8) * 50}ms">
+                <div class="card person" role="button" tabindex="0" data-user="${user._id}"
+                    aria-label="Ver detalhes de ${escapeHtml(user.name || 'Sem nome')}" style="animation-delay:${Math.min(i, 8) * 50}ms">
                     <span class="avatar" aria-hidden="true">${escapeHtml(initials(user.name))}</span>
                     <span class="person-info">
                         <span>
@@ -178,18 +180,28 @@ function renderProfessor(main, me) {
                         </span>
                         <span class="tags">
                             ${user.member ? '<span class="tag tag-success">🛡️ Membro</span>' : ''}
-                            ${user.baptized ? '<span class="tag">💧 Batizado</span>' : ''}
+                            ${isAvancaiTeam(user) ? '<span class="tag tag-accent">👥 Equipe Avançai</span>' : ''}
                             ${user.status ? `<span class="tag ${user.status === 'Presente' ? 'tag-success' : 'tag-danger'}">${escapeHtml(user.status)}</span>` : ''}
-                            <span class="tag">🤝 ${escapeHtml(user.facilitator || 'Sem facilitador')}</span>
+                            ${user.facilitator ? `<span class="tag">🤝 Facilita: ${escapeHtml(user.facilitator)}</span>` : ''}
+                            <span class="tag">💧 ${user.baptized ? 'Batizado' : 'Não batizado'}</span>
                             <span class="tag tag-accent">📖 ${done} ${done === 1 ? 'aula' : 'aulas'}</span>
+                            ${user.phone ? phoneLink(user.phone) : ''}
                         </span>
                         ${trilha.total ? progressBar('Progresso', trilha.done, trilha.total) : ''}
                     </span>
-                </button>`
+                </div>`
         }).join('')
 
-        lista.querySelectorAll('[data-user]').forEach((button) => {
-            button.addEventListener('click', () => openStudent(button.dataset.user))
+        lista.querySelectorAll('[data-user]').forEach((card) => {
+            // clique no telefone abre só o WhatsApp
+            card.addEventListener('click', (event) => {
+                if (!event.target.closest('a')) openStudent(card.dataset.user)
+            })
+            card.addEventListener('keydown', (event) => {
+                if (event.target !== card || (event.key !== 'Enter' && event.key !== ' ')) return
+                event.preventDefault()
+                openStudent(card.dataset.user)
+            })
         })
         fillProgress(lista)
     }
@@ -206,7 +218,7 @@ function renderProfessor(main, me) {
         dialog.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => dialog.close()))
 
         const body = dialog.querySelector('.sheet-body')
-        let mode = 'view' // 'view' | 'date' | 'confirm-remove'
+        let mode = 'view' // 'view' | 'date' | 'confirm-remove' | 'confirm-team'
         let saving = false
 
         function draw() {
@@ -221,7 +233,7 @@ function renderProfessor(main, me) {
             body.innerHTML = `
                 <div class="section-title">👤 Dados pessoais</div>
                 <div class="box detail-rows">
-                    ${row('Telefone', user.phone)}
+                    <div class="detail-row"><span>Telefone</span>${user.phone ? phoneLink(user.phone) : '<strong>—</strong>'}</div>
                     ${row('Gênero', user.gender)}
                     ${row('Nascimento', formatDate(user.birthdate))}
                     ${row('Batizado', user.baptized ? 'Sim' : 'Não')}
@@ -231,6 +243,10 @@ function renderProfessor(main, me) {
 
                 <div class="section-title">🛡️ Membro</div>
                 ${membershipHtml(user)}
+
+                ${canManageAvancaiTeam(me) ? `
+                    <div class="section-title">👥 Equipe do Avançai</div>
+                    ${teamHtml(user)}` : ''}
 
                 <div class="section-title">📊 Progresso por módulo</div>
                 <div class="box">
@@ -333,6 +349,37 @@ function renderProfessor(main, me) {
                 </div>`
         }
 
+        // Equipe do Avançai = acesso ao Painel do Professor
+        function teamHtml(user) {
+            const inTeam = isAvancaiTeam(user)
+            let actions
+            if (mode === 'confirm-team') {
+                actions = `
+                    <div class="inline-confirm">
+                        <span>Tirar da equipe?</span>
+                        <button type="button" class="icon-btn" id="confirmar-equipe" aria-label="Confirmar saída da equipe" ${saving ? 'disabled' : ''}>${saving ? '…' : '✓'}</button>
+                        <button type="button" class="icon-btn" id="cancelar" aria-label="Cancelar" ${saving ? 'disabled' : ''}>✗</button>
+                    </div>`
+            } else if (inTeam) {
+                actions = '<button type="button" class="btn btn-danger-outline btn-sm" id="sair-equipe">Tirar da equipe</button>'
+            } else {
+                actions = `<button type="button" class="btn btn-primary" id="entrar-equipe" ${saving ? 'disabled' : ''}>
+                    ${saving ? 'Salvando...' : '👥 Tornar membro da equipe'}</button>`
+            }
+
+            return `
+                <div class="box">
+                    <div class="member-head">
+                        <span class="icon" aria-hidden="true">${inTeam ? '👥' : '🔒'}</span>
+                        <div>
+                            <strong>${inTeam ? 'Faz parte da equipe' : 'Não faz parte da equipe'}</strong>
+                            <small>${inTeam ? 'Tem acesso ao Painel do Professor' : 'A equipe acessa o Painel do Professor e acompanha os alunos'}</small>
+                        </div>
+                    </div>
+                    ${actions}
+                </div>`
+        }
+
         function bindMembership(user) {
             const on = (id, fn) => body.querySelector(`#${id}`)?.addEventListener('click', fn)
             const setMode = (next) => () => {
@@ -352,13 +399,19 @@ function renderProfessor(main, me) {
                 save(user, { member: true, memberSince: fromDateInput(value) }, `${user.name} agora é membro`)
             })
             on('confirmar-remover', () => save(user, { member: false }, `${user.name} não é mais membro`))
+            on('sair-equipe', setMode('confirm-team'))
+            on('entrar-equipe', () => save(user, null, `${user.name} agora faz parte da equipe do Avançai`, true))
+            on('confirmar-equipe', () => save(user, null, `${user.name} saiu da equipe do Avançai`, false))
         }
 
-        async function save(user, fields, success) {
+        // fields = null: mexe só na equipe (team = entrar/sair)
+        async function save(user, fields, success, team) {
             saving = true
             draw()
             try {
-                const updated = await userApi.patch(user._id, fields)
+                const updated = fields
+                    ? await userApi.patch(user._id, fields)
+                    : await userApi.setTeam(user._id, 'avancai', team)
                 users = users.map((u) => (u._id === updated._id ? updated : u))
                 mode = 'view'
                 toast(success)
@@ -376,6 +429,11 @@ function renderProfessor(main, me) {
 
     load()
 }
+
+// Telefone que abre a conversa no WhatsApp
+const phoneLink = (phone) => `
+    <a class="tag tag-whatsapp" href="${whatsAppUrl(phone)}" target="_blank" rel="noopener"
+        aria-label="Abrir WhatsApp de ${escapeHtml(phone)}">💬 ${escapeHtml(phone)}</a>`
 
 const row = (label, value) => `
     <div class="detail-row"><span>${label}</span><strong>${escapeHtml(value || '—')}</strong></div>`

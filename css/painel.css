@@ -760,6 +760,10 @@ dialog.sheet::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4
 .tag-accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
 .tag-success { background: var(--success-soft); color: var(--success); border-color: transparent; }
 .tag-danger { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+.tag-whatsapp { background: var(--success-soft); color: var(--success); border-color: transparent; text-decoration: none; }
+.tag-whatsapp:hover { filter: brightness(1.15); }
+.person { cursor: pointer; }
+.person:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .detail-rows { display: flex; flex-direction: column; }
 

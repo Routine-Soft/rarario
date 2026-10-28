@@ -17,6 +17,10 @@ export const userApi = {
     updatePassword: (id, newPassword, currentPassword) =>
         httpClient.post(`/users/${id}/password`, { newPassword, currentPassword }),
     getChurches: () => httpClient.get('/churchs'),
+    // Entra ou sai da equipe de um departamento (ex.: 'avancai')
+    setTeam: (id, team, add) => (add
+        ? httpClient.put(`/users/${id}/team/${team}`)
+        : httpClient.delete(`/users/${id}/team/${team}`)),
 }
 
 export const GENDERS = ['Masculino', 'Feminino']
@@ -64,3 +68,12 @@ export const TEACHER_ROLES = ['super_admin', 'pastor_local', 'secretaria_igreja'
 
 export const isTeacher = (user) => (user?.roles ?? []).some((role) => TEACHER_ROLES.includes(role))
 export const isSuperAdmin = (user) => (user?.roles ?? []).includes('super_admin')
+
+// Quem monta a equipe do Avançai (cargos reais: a equipe não monta a própria
+// equipe; espelha canManageTeam do backend)
+export const canManageAvancaiTeam = (user) =>
+    (user?.roles ?? []).some((role) => ['super_admin', 'pastor_local', 'secretaria_igreja', 'avancai_lider'].includes(role))
+export const isAvancaiTeam = (user) => (user?.roles ?? []).includes('avancai_equipe')
+
+// Link do WhatsApp para o telefone salvo (DDI + DDD + número)
+export const whatsAppUrl = (phone) => `https://wa.me/${String(phone ?? '').replace(/\D/g, '')}`

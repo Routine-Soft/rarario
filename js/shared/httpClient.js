@@ -85,6 +85,7 @@ export async function http(method, path, body) {
 export const httpClient = {
     get: (path) => http('GET', path),
     post: (path, body = {}) => http('POST', path, body),
+    put: (path, body = {}) => http('PUT', path, body),
     patch: (path, body = {}) => http('PATCH', path, body),
     delete: (path) => http('DELETE', path),
 }
