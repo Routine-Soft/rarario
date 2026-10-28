@@ -54,11 +54,11 @@ function render(user) {
                     <input class="input" id="nome" autocomplete="name" required value="${escapeHtml(user?.name ?? '')}">
                 </div>
                 <div class="field">
-                    <label for="genero">Gênero</label>
-                    <select class="input" id="genero"><option value="">Escolha</option>${options(GENDERS, user?.gender)}</select>
+                    <label for="genero">Gênero *</label>
+                    <select class="input" id="genero" required><option value="">Escolha</option>${options(GENDERS, user?.gender)}</select>
                 </div>
                 <div class="field">
-                    <label for="nascimento">Data de nascimento</label>
+                    <label for="nascimento">Data de nascimento *</label>
                     <input class="input" id="nascimento" type="date" max="${toDateInput()}"
                         value="${user?.birthdate ? toDateInput(user.birthdate) : ''}">
                 </div>
@@ -83,7 +83,7 @@ function render(user) {
                     <select class="input" id="pais">${COUNTRIES.map(([label], i) => `<option value="${i}">${label}</option>`).join('')}</select>
                 </div>
                 <div class="field">
-                    <label for="telefone">Telefone</label>
+                    <label for="telefone">Telefone *</label>
                     <input class="input" id="telefone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="DDD + número">
                 </div>
             </fieldset>
@@ -93,19 +93,19 @@ function render(user) {
             <fieldset class="form-section reveal" style="--i:7">
                 <legend>🏠 Endereço</legend>
                 <div class="field">
-                    <label for="cep">CEP</label>
+                    <label for="cep">CEP *</label>
                     <input class="input" id="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9">
                     <small class="field-hint" id="cep-status" aria-live="polite"></small>
                 </div>
-                <div class="field"><label for="rua">Rua</label><input class="input" id="rua" autocomplete="address-line1"></div>
+                <div class="field"><label for="rua">Rua *</label><input class="input" id="rua" autocomplete="address-line1"></div>
                 <div class="field-row">
                     <div class="field"><label for="numero">Nº</label><input class="input" id="numero"></div>
                     <div class="field"><label for="complemento">Complemento</label><input class="input" id="complemento" autocomplete="address-line2"></div>
                 </div>
-                <div class="field"><label for="bairro">Bairro</label><input class="input" id="bairro"></div>
+                <div class="field"><label for="bairro">Bairro *</label><input class="input" id="bairro"></div>
                 <div class="field-row">
-                    <div class="field"><label for="cidade">Cidade</label><input class="input" id="cidade" autocomplete="address-level2"></div>
-                    <div class="field"><label for="estado">Estado</label><input class="input" id="estado" autocomplete="address-level1"></div>
+                    <div class="field"><label for="cidade">Cidade *</label><input class="input" id="cidade" autocomplete="address-level2"></div>
+                    <div class="field"><label for="estado">Estado *</label><input class="input" id="estado" autocomplete="address-level1"></div>
                 </div>
             </fieldset>
 
@@ -211,9 +211,16 @@ function render(user) {
         if (!user && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(normalizeEmail(value('email')))) {
             return 'Informe um e-mail válido.'
         }
+        if (!value('genero')) return 'Escolha o gênero.'
+        if (!value('nascimento')) return 'Informe a data de nascimento.'
         const phone = value('telefone').replace(/\D/g, '')
-        if (phone && phone.length < 10) return 'O telefone precisa ter DDD + número (pelo menos 10 números).'
+        if (!phone) return 'Informe o telefone.'
+        if (phone.length < 10) return 'O telefone precisa ter DDD + número (pelo menos 10 números).'
         if (!value('igreja')) return 'Escolha a sua igreja.'
+        if (value('cep').replace(/\D/g, '').length !== 8) return 'Informe o CEP com 8 números.'
+        for (const [id, nome] of [['rua', 'a rua'], ['bairro', 'o bairro'], ['cidade', 'a cidade'], ['estado', 'o estado']]) {
+            if (!value(id)) return `Informe ${nome}.`
+        }
         if (!user) {
             const senha = $('senha').value
             if (senha.length < 6) return 'A senha precisa ter pelo menos 6 caracteres.'

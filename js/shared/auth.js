@@ -14,8 +14,13 @@ export const destino = () => (DESTINOS.includes(params.get('voltar')) ? params.g
 // Link para outra tela de acesso levando o destino junto
 export const linkAcesso = (pagina, extra = '') => `./${pagina}?voltar=${destino()}${extra}`
 
-// Conta criada pelo Google começa só com nome e e-mail (igual ao app)
-export const precisaCompletar = (user) => !user?.churchId
+// Conta criada pelo Google começa só com nome e e-mail: falta tudo o que o
+// cadastro exige (só Nº e complemento são opcionais)
+export const precisaCompletar = (user) => {
+    const a = user?.address ?? {}
+    return ![user?.name, user?.gender, user?.birthdate, user?.phone, user?.churchId,
+        a.cep, a.address, a.neighborhood, a.city, a.state].every(Boolean)
+}
 
 // Painel sem sessão: vai para a tela de entrar e volta depois
 export function irParaEntrar(painel, expirou = false) {
