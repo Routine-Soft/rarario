@@ -87,11 +87,12 @@ function renderAluno(main, user) {
         modulos.innerHTML = filled.map((module, i) => {
             const list = groups[module]
             const count = list.filter(isDone).length
+            const dispensed = list.every((l) => isDispensed(user, l))
             return `
-                <details class="card module ${list.every((l) => isDispensed(user, l)) ? 'dispensed' : ''}" data-module="${module}" ${abertos.has(module) ? 'open' : ''}
+                <details class="card module ${dispensed ? 'dispensed' : ''}" data-module="${module}" ${abertos.has(module) ? 'open' : ''}
                     style="animation-delay:${i * 60}ms">
                     <summary>
-                        ${progressBar(moduleLabel(module), count, list.length)}
+                        ${progressBar(dispensed ? `${moduleLabel(module)} (não precisa fazer)` : moduleLabel(module), count, list.length)}
                         <span class="chevron" aria-hidden="true">❯</span>
                     </summary>
                     <ul class="lesson-list">

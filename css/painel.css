@@ -476,7 +476,12 @@ a { color: var(--accent); }
     transition: background 0.2s ease;
 }
 
-.module.dispensed { opacity: 0.55; filter: saturate(0.6); }
+.module.dispensed {
+    opacity: 0.7;
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    --accent-grad: linear-gradient(135deg, #f87171, #ef4444);
+}
 .module.dispensed[open], .module.dispensed:hover { opacity: 0.85; }
 
 .info-card {
