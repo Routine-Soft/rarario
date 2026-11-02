@@ -13,13 +13,13 @@ const MODULE_LABELS = {
 
 export const moduleLabel = (module) => MODULE_LABELS[module] ?? String(module).toUpperCase()
 
-// Quem é batizado não faz o RESET: o módulo some da trilha e do total
-export const modulesFor = (user) => LESSON_MODULES.filter((m) => !(user?.baptized && m === 'reset'))
+// Quem é batizado não faz o RESET: as aulas aparecem (os professores usam para
+// dar aula), mas ficam dispensadas: contam como feitas e sem questionário.
+export const isDispensed = (user, lesson) => Boolean(user?.baptized) && lesson.module === 'reset'
 
-export const lessonsFor = (lessons, user) => {
-    const modules = modulesFor(user)
-    return lessons.filter((l) => modules.includes(l.module))
-}
+// Primeira aula do START: é por onde o batizado começa
+export const firstStartLesson = (lessons) =>
+    lessons.filter((l) => l.module === 'start').sort((a, b) => a.number - b.number)[0] ?? null
 
 // { historia: [aulas...], reset: [...], ... } na ordem dos módulos e das aulas
 export function groupByModule(lessons) {

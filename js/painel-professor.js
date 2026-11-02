@@ -4,7 +4,7 @@
 import { mountPanel } from './shared/painel.js'
 import { lessonApi } from './lesson/lesson.api.js'
 import { userApi, isTeacher, isSuperAdmin, canManageAvancaiTeam, isAvancaiTeam, whatsAppUrl } from './user/user.api.js'
-import { LESSON_MODULES, modulesFor, lessonsFor, moduleLabel, groupByModule, refId } from './lesson/lesson.utils.js'
+import { LESSON_MODULES, isDispensed, moduleLabel, groupByModule, refId } from './lesson/lesson.utils.js'
 import { giftTestApi, resultOf, bestGifts } from './gift/gift.api.js'
 import {
     escapeHtml, toast, skeletons, emptyState, progressBar, fillProgress, openSheet,
@@ -56,10 +56,13 @@ function renderProfessor(main, me) {
 
     const lessonsDone = (userId) => progresses.filter((p) => refId(p.userId) === userId)
 
-    // Trilha de cada aluno: aulas que ele faz (batizado não faz o RESET) + testes
+    // Trilha de cada aluno: todas as aulas (RESET de batizado conta como feito) + testes
     function journey(user) {
-        const visible = new Set(lessonsFor(lessons, user).map((l) => l._id))
-        const doneLessons = lessonsDone(user._id).filter((p) => visible.has(refId(p.lessonId))).length
+        const dispensed = lessons.filter((l) => isDispensed(user, l))
+        const dispensedIds = new Set(dispensed.map((l) => l._id))
+        const visible = new Set(lessons.map((l) => l._id))
+        const doneLessons = dispensed.length
+            + lessonsDone(user._id).filter((p) => visible.has(refId(p.lessonId)) && !dispensedIds.has(refId(p.lessonId))).length
         const doneTests = tests.filter((t) => resultOf(user, t.key)).length
         return { done: doneLessons + doneTests, total: visible.size + tests.length }
     }
@@ -250,9 +253,9 @@ function renderProfessor(main, me) {
 
                 <div class="section-title">📊 Progresso por módulo</div>
                 <div class="box">
-                    ${modulesFor(user).filter((m) => groups[m]?.length).map((m) => progressBar(
+                    ${LESSON_MODULES.filter((m) => groups[m]?.length).map((m) => progressBar(
                         moduleLabel(m),
-                        (groups[m] ?? []).filter((l) => doneIds.has(l._id)).length,
+                        (groups[m] ?? []).filter((l) => doneIds.has(l._id) || isDispensed(user, l)).length,
                         (groups[m] ?? []).length,
                     )).join('')}
                     ${tests.length ? progressBar(
@@ -261,7 +264,7 @@ function renderProfessor(main, me) {
                         tests.length,
                     ) : ''}
                 </div>
-                ${user.baptized && groups.reset?.length ? '<p class="muted">💧 Batizado: não precisa fazer o RESET.</p>' : ''}
+                ${user.baptized && groups.reset?.length ? '<p class="muted">💧 Batizado: o RESET já conta como feito e ele começa pelo START.</p>' : ''}
 
                 ${tests.length ? `
                     <div class="section-title">🎁 Testes de dons</div>

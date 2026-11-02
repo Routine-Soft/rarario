@@ -476,6 +476,21 @@ a { color: var(--accent); }
     transition: background 0.2s ease;
 }
 
+.module.dispensed { opacity: 0.55; filter: saturate(0.6); }
+.module.dispensed[open], .module.dispensed:hover { opacity: 0.85; }
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.info-card > span { font-size: 1.4rem; }
+.info-card p { margin: 0; }
+
 .lesson-item:hover { background: var(--glass-bg-strong); }
 
 .lesson-num {

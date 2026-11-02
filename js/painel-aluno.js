@@ -1,13 +1,14 @@
 // Painel do Aluno: aulas do Avançai agrupadas por módulo, com os acertos de
 // cada uma, e por último os Testes dos Dons; abre a aula para estudar e
-// responder (espelha lesson_page.dart). Batizado não vê o RESET.
+// responder (espelha lesson_page.dart). Batizado vê o RESET esmaecido: abre a
+// aula, mas não responde o questionário (já começa no START).
 import { mountPanel } from './shared/painel.js'
 import { updateSession } from './shared/session.js'
 import { lessonApi } from './lesson/lesson.api.js'
 import { giftTestApi, resultOf, bestGifts } from './gift/gift.api.js'
 import { openGiftTest } from './gift/gift.sheet.js'
 import {
-    modulesFor, lessonsFor, moduleLabel, groupByModule, refId, optionLetter,
+    LESSON_MODULES, isDispensed, firstStartLesson, moduleLabel, groupByModule, refId, optionLetter,
     lessonSubtitle, lessonContentHtml, bindVideo,
 } from './lesson/lesson.utils.js'
 import {
@@ -35,6 +36,7 @@ function renderAluno(main, user) {
     const modulos = main.querySelector('#modulos')
 
     const progressOf = (lessonId) => mine.find((p) => refId(p.lessonId) === lessonId)
+    const isDone = (lesson) => isDispensed(user, lesson) || Boolean(progressOf(lesson._id))
 
     async function load() {
         try {
@@ -59,16 +61,21 @@ function renderAluno(main, user) {
     }
 
     function draw() {
-        const visible = lessonsFor(lessons, user)
+        const visible = lessons
         const groups = groupByModule(visible)
         const tests = catalog.tests ?? []
         const testsDone = tests.filter((t) => resultOf(user, t.key)).length
         // Os testes dos dons contam no total, junto com as aulas
         const total = visible.length + tests.length
-        const done = visible.filter((l) => progressOf(l._id)).length + testsDone
-        geral.innerHTML = total ? progressBar('Seu progresso', done, total) : ''
+        const done = visible.filter(isDone).length + testsDone
+        const start = user.baptized ? firstStartLesson(lessons) : null
+        geral.innerHTML = (total ? progressBar('Seu progresso', done, total) : '') + (start ? `
+            <div class="box info-card" role="note">
+                <span aria-hidden="true">💧</span>
+                <p>Como você já é batizado(a), começa pelo <strong>START</strong>, na <strong>aula ${start.number}</strong>. O RESET não precisa fazer.</p>
+            </div>` : '')
 
-        const filled = modulesFor(user).filter((m) => groups[m]?.length)
+        const filled = LESSON_MODULES.filter((m) => groups[m]?.length)
         if (!filled.length && !tests.length) {
             modulos.innerHTML = emptyState({ icon: '📚', message: 'Nenhuma aula disponível ainda. Volte em breve!' })
             return
@@ -79,9 +86,9 @@ function renderAluno(main, user) {
 
         modulos.innerHTML = filled.map((module, i) => {
             const list = groups[module]
-            const count = list.filter((l) => progressOf(l._id)).length
+            const count = list.filter(isDone).length
             return `
-                <details class="card module" data-module="${module}" ${abertos.has(module) ? 'open' : ''}
+                <details class="card module ${list.every((l) => isDispensed(user, l)) ? 'dispensed' : ''}" data-module="${module}" ${abertos.has(module) ? 'open' : ''}
                     style="animation-delay:${i * 60}ms">
                     <summary>
                         ${progressBar(moduleLabel(module), count, list.length)}
@@ -127,13 +134,16 @@ function renderAluno(main, user) {
 
     function lessonItem(lesson) {
         const progress = progressOf(lesson._id)
+        const dispensed = isDispensed(user, lesson)
         return `
             <li>
-                <button type="button" class="lesson-item ${progress ? 'done' : ''}" data-lesson="${lesson._id}">
-                    <span class="lesson-num" aria-hidden="true">${progress ? '✓' : lesson.number}</span>
+                <button type="button" class="lesson-item ${progress || dispensed ? 'done' : ''}" data-lesson="${lesson._id}">
+                    <span class="lesson-num" aria-hidden="true">${progress || dispensed ? '✓' : lesson.number}</span>
                     <span class="lesson-info">
                         <strong>${escapeHtml(lesson.title)}</strong>
-                        <span>${progress
+                        <span>${dispensed
+                            ? 'Dispensada (batizado) • só leitura'
+                            : progress
                             ? `Acertos: ${progress.score}/${progress.totalQuestions}`
                             : `Aula ${lesson.number} • não iniciada`}</span>
                     </span>
@@ -161,7 +171,8 @@ function renderAluno(main, user) {
 
     // Aluno estuda a aula e responde as perguntas (lesson_study_dialog.dart)
     function openStudy(lesson) {
-        const questions = lesson.questions ?? []
+        const dispensed = isDispensed(user, lesson)
+        const questions = dispensed ? [] : lesson.questions ?? []
         const selected = new Map() // questionIndex -> optionIndex
         let result = null
 
@@ -191,6 +202,7 @@ function renderAluno(main, user) {
                         <div><small>Resultado</small><strong>${result.score} de ${result.total} acertos</strong></div>
                     </div>` : ''}
                 ${lessonContentHtml(lesson)}
+                ${dispensed && lesson.questions?.length ? '<p class="muted">💧 Você é batizado(a) e não responde o questionário do RESET. A aula está aberta só para consulta.</p>' : ''}
                 ${questions.length ? `
                     <div class="section-title">
                         <span>❓ Questões</span>
@@ -201,7 +213,8 @@ function renderAluno(main, user) {
             body.querySelectorAll('input[type="radio"]').forEach((input) => {
                 input.addEventListener('change', () => {
                     selected.set(Number(input.dataset.q), Number(input.value))
-                    body.querySelector('#contador').textContent = `${selected.size}/${questions.length}`
+                    const contador = body.querySelector('#contador')
+                    if (contador) contador.textContent = `${selected.size}/${questions.length}`
                     drawFoot()
                 })
             })
