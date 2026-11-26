@@ -29,16 +29,11 @@ function renderProfessor(main, me) {
     let churchId = me.churchId ?? ''
 
     main.innerHTML = `
-        <section class="card hero">
-            <span class="badge-step">AVANÇAI • LIDERANÇA</span>
-            <h1>Acompanhe seus alunos</h1>
-            <p>Veja quantas aulas cada pessoa já fez e torne membro quem concluiu a integração.</p>
-            ${isSuperAdmin(me) ? `
-                <div class="field">
-                    <label for="igreja">Igreja</label>
-                    <select class="input" id="igreja"><option value="">Carregando igrejas...</option></select>
-                </div>` : ''}
-        </section>
+        ${isSuperAdmin(me) ? `
+            <div class="field">
+                <label for="igreja">Igreja</label>
+                <select class="input" id="igreja"><option value="">Carregando igrejas...</option></select>
+            </div>` : ''}
         <div class="stats" id="numeros"></div>
         <div class="filters">
             <div class="tabs" role="tablist" aria-label="Filtrar pessoas">
@@ -190,11 +185,15 @@ function renderProfessor(main, me) {
     function drawAll() {
         const members = users.filter((u) => u.member).length
         const finished = users.filter(finishedAll).length
+        const notStarted = users.filter((u) => journey(u).done === 0).length
+        const ongoing = users.length - finished - notStarted
         numeros.innerHTML = `
             <div class="card stat"><strong>${users.length - members}</strong><span>Alunos</span></div>
-            <div class="card stat" style="animation-delay:60ms"><strong>${members}</strong><span>Membros</span></div>
-            <div class="card stat" style="animation-delay:120ms"><strong>${finished}</strong><span>Concluíram tudo</span></div>
-            <div class="card stat" style="animation-delay:180ms"><strong>${lessons.length + tests.length}</strong><span>Aulas (com testes)</span></div>`
+            <div class="card stat"><strong>${members}</strong><span>Membros</span></div>
+            <div class="card stat"><strong>${finished}</strong><span>Concluíram tudo</span></div>
+            <div class="card stat"><strong>${ongoing}</strong><span>Em andamento</span></div>
+            <div class="card stat"><strong>${notStarted}</strong><span>Não começaram</span></div>
+            <div class="card stat"><strong>${lessons.length + tests.length}</strong><span>Aulas (com testes)</span></div>`
         drawList()
     }
 
