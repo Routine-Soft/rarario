@@ -67,24 +67,25 @@ function renderProfessor(main, me) {
     const lessonsDone = (userId) => progresses.filter((p) => refId(p.userId) === userId)
 
     // Trilha de cada aluno: todas as aulas (RESET de batizado conta como feito) + testes
+    // No painel do professor, batizado não tem RESET: ele nem entra na conta
+    const skipsReset = (user, lesson) => isDispensed(user, lesson)
+
     function journey(user) {
-        const dispensed = lessons.filter((l) => isDispensed(user, l))
-        const dispensedIds = new Set(dispensed.map((l) => l._id))
-        const visible = new Set(lessons.map((l) => l._id))
-        const doneLessons = dispensed.length
-            + lessonsDone(user._id).filter((p) => visible.has(refId(p.lessonId)) && !dispensedIds.has(refId(p.lessonId))).length
+        const visible = lessons.filter((l) => !skipsReset(user, l))
+        const ids = new Set(visible.map((l) => l._id))
+        const doneLessons = lessonsDone(user._id).filter((p) => ids.has(refId(p.lessonId))).length
         const doneTests = tests.filter((t) => resultOf(user, t.key)).length
-        return { done: doneLessons + doneTests, total: visible.size + tests.length }
+        return { done: doneLessons + doneTests, total: visible.length + tests.length }
     }
 
     // Uma fatia por aula (e por teste), na ordem da trilha, com a cor do módulo
     function segments(user) {
         const doneIds = new Set(lessonsDone(user._id).map((p) => refId(p.lessonId)))
-        const groups = groupByModule(lessons)
+        const groups = groupByModule(lessons.filter((l) => !skipsReset(user, l)))
         const parts = LESSON_MODULES.filter((m) => groups[m]?.length).map((m) => ({
             key: m,
             label: moduleLabel(m),
-            items: groups[m].map((l) => doneIds.has(l._id) || isDispensed(user, l)),
+            items: groups[m].map((l) => doneIds.has(l._id)),
         }))
         if (tests.length) parts.push({ key: 'dons', label: 'TESTES DE DONS', items: tests.map((t) => Boolean(resultOf(user, t.key))) })
         return parts
@@ -293,7 +294,7 @@ function renderProfessor(main, me) {
 
             const done = lessonsDone(user._id)
             const doneIds = new Set(done.map((p) => refId(p.lessonId)))
-            const groups = groupByModule(lessons)
+            const groups = groupByModule(lessons.filter((l) => !skipsReset(user, l)))
 
             body.innerHTML = `
                 <div class="section-title">👤 Dados pessoais</div>
@@ -317,7 +318,7 @@ function renderProfessor(main, me) {
                 <div class="box">
                     ${LESSON_MODULES.filter((m) => groups[m]?.length).map((m) => progressBar(
                         moduleLabel(m),
-                        (groups[m] ?? []).filter((l) => doneIds.has(l._id) || isDispensed(user, l)).length,
+                        (groups[m] ?? []).filter((l) => doneIds.has(l._id)).length,
                         (groups[m] ?? []).length,
                     )).join('')}
                     ${tests.length ? progressBar(
@@ -326,7 +327,7 @@ function renderProfessor(main, me) {
                         tests.length,
                     ) : ''}
                 </div>
-                ${user.baptized && groups.reset?.length ? '<p class="muted">💧 Batizado: o RESET já conta como feito e ele começa pelo START.</p>' : ''}
+                ${user.baptized ? '<p class="muted">💧 Batizado: não faz o RESET, ele começa pelo START.</p>' : ''}
 
                 ${tests.length ? `
                     <div class="section-title">🎁 Testes de dons</div>
