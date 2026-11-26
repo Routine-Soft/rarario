@@ -693,7 +693,7 @@ dialog.sheet::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4
 /* ===================================================
    PROFESSOR: números, abas, lista de pessoas
    =================================================== */
-.stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
 .stat {
     padding: 8px 6px;
@@ -982,7 +982,6 @@ select.input option { background: var(--dialog-bg); color: var(--text); }
     .hero h1 { font-size: 1.35rem; }
     .stat { padding: 8px 4px; }
     .stat strong { font-size: 1.1rem; }
-    .stats { grid-template-columns: repeat(3, 1fr); }
     .theme-select { max-width: 110px; }
     .auth-card { padding: 24px 16px; }
     .form-section { padding: 16px 14px; }

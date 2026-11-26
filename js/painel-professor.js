@@ -190,10 +190,10 @@ function renderProfessor(main, me) {
         numeros.innerHTML = `
             <div class="card stat"><strong>${users.length - members}</strong><span>Alunos</span></div>
             <div class="card stat"><strong>${members}</strong><span>Membros</span></div>
+            <div class="card stat"><strong>${lessons.length + tests.length}</strong><span>Aulas (com testes)</span></div>
             <div class="card stat"><strong>${finished}</strong><span>Concluíram tudo</span></div>
             <div class="card stat"><strong>${ongoing}</strong><span>Em andamento</span></div>
-            <div class="card stat"><strong>${notStarted}</strong><span>Não começaram</span></div>
-            <div class="card stat"><strong>${lessons.length + tests.length}</strong><span>Aulas (com testes)</span></div>`
+            <div class="card stat"><strong>${notStarted}</strong><span>Não começaram</span></div>`
         drawList()
     }
 
