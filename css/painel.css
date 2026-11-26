@@ -693,7 +693,7 @@ dialog.sheet::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4
 /* ===================================================
    PROFESSOR: números, abas, lista de pessoas
    =================================================== */
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
 .stat {
     padding: 14px 12px;
@@ -981,6 +981,7 @@ select.input option { background: var(--dialog-bg); color: var(--text); }
     .card { padding: 16px; border-radius: 20px; }
     .hero h1 { font-size: 1.35rem; }
     .stat strong { font-size: 1.25rem; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
     .theme-select { max-width: 110px; }
     .auth-card { padding: 24px 16px; }
     .form-section { padding: 16px 14px; }
@@ -1025,3 +1026,47 @@ select.input option { background: var(--dialog-bg); color: var(--text); }
 }
 
 .stack { display: flex; flex-direction: column; gap: 20px; }
+
+
+/* ===================================================
+   COPIAR NOME E BARRA DE TRILHA (professor)
+   =================================================== */
+.copy-btn {
+    margin-left: 6px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: var(--glass-bg-strong);
+    color: var(--text-soft);
+    font-size: 0.8rem;
+    line-height: 1;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+.copy-btn:hover { transform: translateY(-1px); background: var(--accent-soft); }
+
+.trail { display: flex; flex-direction: column; gap: 6px; }
+.trail .progress-head strong { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); }
+.trail .progress-head span { font-size: 0.8rem; color: var(--text-muted); }
+.trail-bar { display: flex; gap: 2px; height: 10px; }
+.trail-bar .seg {
+    flex: 1;
+    border-radius: 3px;
+    background: var(--skeleton);
+    transition: background 0.4s ease;
+}
+.trail-bar .seg:first-child { border-radius: 999px 3px 3px 999px; }
+.trail-bar .seg:last-child { border-radius: 3px 999px 999px 3px; }
+.trail-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; }
+.trail-legend span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.trail-legend b { width: 7px; height: 7px; border-radius: 50%; background: var(--seg); }
+
+.seg-historia { --seg: #a78bfa; }
+.seg-reset { --seg: #f87171; }
+.seg-start { --seg: #38bdf8; }
+.seg-cdv { --seg: #fbbf24; }
+.seg-dons { --seg: #f472b6; }
+.trail-bar .seg.on { background: var(--seg); }

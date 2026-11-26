@@ -25,6 +25,7 @@ function renderProfessor(main, me) {
     let tests = [] // Testes dos Dons (contam no total, junto com as aulas)
     let tab = 'alunos' // 'alunos' | 'membros'
     let search = ''
+    let filter = 'todos' // 'todos' | 'concluiram' | 'andamento' | 'nao-comecou'
     let churchId = me.churchId ?? ''
 
     main.innerHTML = `
@@ -49,6 +50,15 @@ function renderProfessor(main, me) {
                 <input class="input" id="busca" type="search" placeholder="Buscar por nome, e-mail ou telefone" autocomplete="off">
             </div>
         </div>
+        <div class="field">
+            <label class="sr-only" for="filtro">Filtrar por progresso</label>
+            <select class="input" id="filtro">
+                <option value="todos">Todos (qualquer progresso)</option>
+                <option value="concluiram">✅ Concluíram todas as aulas</option>
+                <option value="andamento">📖 Em andamento</option>
+                <option value="nao-comecou">⏳ Ainda não começaram</option>
+            </select>
+        </div>
         <div class="people" id="lista">${skeletons(4)}</div>`
 
     const numeros = main.querySelector('#numeros')
@@ -67,12 +77,51 @@ function renderProfessor(main, me) {
         return { done: doneLessons + doneTests, total: visible.size + tests.length }
     }
 
+    // Uma fatia por aula (e por teste), na ordem da trilha, com a cor do módulo
+    function segments(user) {
+        const doneIds = new Set(lessonsDone(user._id).map((p) => refId(p.lessonId)))
+        const groups = groupByModule(lessons)
+        const parts = LESSON_MODULES.filter((m) => groups[m]?.length).map((m) => ({
+            key: m,
+            label: moduleLabel(m),
+            items: groups[m].map((l) => doneIds.has(l._id) || isDispensed(user, l)),
+        }))
+        if (tests.length) parts.push({ key: 'dons', label: 'TESTES DE DONS', items: tests.map((t) => Boolean(resultOf(user, t.key))) })
+        return parts
+    }
+
+    function trailBar(user, trilha) {
+        const parts = segments(user)
+        const pct = trilha.total ? Math.round((trilha.done / trilha.total) * 100) : 0
+        return `
+            <div class="trail" role="img" aria-label="Progresso: ${trilha.done} de ${trilha.total} (aulas e testes dos dons)">
+                <div class="progress-head"><strong>Progresso • ${pct}%</strong><span>${trilha.done} de ${trilha.total}</span></div>
+                <div class="trail-bar">
+                    ${parts.map((part) => part.items.map((done) =>
+                        `<i class="seg seg-${part.key}${done ? ' on' : ''}"></i>`).join('')).join('')}
+                </div>
+                <div class="trail-legend">
+                    ${parts.map((part) => `<span class="seg-${part.key}"><b></b>${escapeHtml(shortLabel(part.key, part.label))} ${part.items.filter(Boolean).length}/${part.items.length}</span>`).join('')}
+                </div>
+            </div>`
+    }
+
+    const finishedAll = (user) => {
+        const t = journey(user)
+        return t.total > 0 && t.done >= t.total
+    }
+
     main.querySelectorAll('[data-tab]').forEach((button) => {
         button.addEventListener('click', () => {
             tab = button.dataset.tab
             main.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b === button)))
             drawList()
         })
+    })
+
+    main.querySelector('#filtro').addEventListener('change', (event) => {
+        filter = event.target.value
+        drawList()
     })
 
     main.querySelector('#busca').addEventListener('input', (event) => {
@@ -139,37 +188,47 @@ function renderProfessor(main, me) {
 
     function drawAll() {
         const members = users.filter((u) => u.member).length
+        const finished = users.filter(finishedAll).length
         numeros.innerHTML = `
             <div class="card stat"><strong>${users.length - members}</strong><span>Alunos</span></div>
             <div class="card stat" style="animation-delay:60ms"><strong>${members}</strong><span>Membros</span></div>
-            <div class="card stat" style="animation-delay:120ms"><strong>${lessons.length}</strong><span>Aulas</span></div>`
+            <div class="card stat" style="animation-delay:120ms"><strong>${finished}</strong><span>Concluíram tudo</span></div>
+            <div class="card stat" style="animation-delay:180ms"><strong>${lessons.length + tests.length}</strong><span>Aulas (com testes)</span></div>`
         drawList()
     }
 
     function drawList() {
         const filtered = users
             .filter((u) => (tab === 'membros' ? u.member : !u.member))
+            .filter((u) => {
+                if (filter === 'todos') return true
+                const { done } = journey(u)
+                if (filter === 'concluiram') return finishedAll(u)
+                return filter === 'andamento' ? done > 0 && !finishedAll(u) : done === 0
+            })
             .filter((u) => !search || [u.name, u.email, u.phone].some((v) => String(v ?? '').toLowerCase().includes(search)))
             .sort((a, b) => String(a.name ?? '').localeCompare(String(b.name ?? ''), 'pt-BR'))
 
         if (!filtered.length) {
             lista.innerHTML = emptyState({
-                icon: search ? '🔍' : tab === 'membros' ? '🛡️' : '🎓',
-                message: search
-                    ? 'Ninguém encontrado com essa busca.'
+                icon: search || filter !== 'todos' ? '🔍' : tab === 'membros' ? '🛡️' : '🎓',
+                message: search || filter !== 'todos'
+                    ? 'Ninguém encontrado com esses filtros.'
                     : tab === 'membros' ? 'Nenhum membro encontrado.' : 'Nenhum aluno encontrado.',
-                action: search ? '<button class="btn btn-outline" id="limpar">Limpar busca</button>' : '',
+                action: search || filter !== 'todos' ? '<button class="btn btn-outline" id="limpar">Limpar filtros</button>' : '',
             })
             lista.querySelector('#limpar')?.addEventListener('click', () => {
                 main.querySelector('#busca').value = ''
                 search = ''
+                filter = 'todos'
+                main.querySelector('#filtro').value = 'todos'
                 drawList()
             })
             return
         }
 
         lista.innerHTML = filtered.map((user, i) => {
-            const done = lessonsDone(user._id).length
+            const done = lessonsDone(user._id).length + tests.filter((t) => resultOf(user, t.key)).length
             const trilha = journey(user)
             // div (e não button): o telefone dentro do card é um link
             return `
@@ -179,6 +238,7 @@ function renderProfessor(main, me) {
                     <span class="person-info">
                         <span>
                             <strong>${escapeHtml(user.name || 'Sem nome')}</strong>
+                            <button type="button" class="copy-btn" data-copy="${escapeHtml(user.name || '')}" aria-label="Copiar nome de ${escapeHtml(user.name || 'Sem nome')}" title="Copiar nome">📋</button>
                             <span class="email" style="display:block">${escapeHtml(user.email ?? '')}</span>
                         </span>
                         <span class="tags">
@@ -190,7 +250,7 @@ function renderProfessor(main, me) {
                             <span class="tag tag-accent">📖 ${done} ${done === 1 ? 'aula' : 'aulas'}</span>
                             ${user.phone ? phoneLink(user.phone) : ''}
                         </span>
-                        ${trilha.total ? progressBar('Progresso', trilha.done, trilha.total) : ''}
+                        ${trilha.total ? trailBar(user, trilha) : ''}
                     </span>
                 </div>`
         }).join('')
@@ -198,6 +258,8 @@ function renderProfessor(main, me) {
         lista.querySelectorAll('[data-user]').forEach((card) => {
             // clique no telefone abre só o WhatsApp
             card.addEventListener('click', (event) => {
+                const copy = event.target.closest('.copy-btn')
+                if (copy) return copyName(copy)
                 if (!event.target.closest('a')) openStudent(card.dataset.user)
             })
             card.addEventListener('keydown', (event) => {
@@ -431,6 +493,27 @@ function renderProfessor(main, me) {
     }
 
     load()
+}
+
+// Nomes curtos para a legenda da barra
+const SHORT = { historia: 'HIST.', reset: 'RESET', start: 'START', cdv: 'CDV', dons: 'DONS' }
+const shortLabel = (key, label) => SHORT[key] ?? label
+
+async function copyName(button) {
+    const name = button.dataset.copy
+    try {
+        await navigator.clipboard.writeText(name)
+    } catch {
+        const area = document.createElement('textarea')
+        area.value = name
+        document.body.appendChild(area)
+        area.select()
+        document.execCommand('copy')
+        area.remove()
+    }
+    toast('Nome copiado')
+    button.textContent = '✓'
+    setTimeout(() => { button.textContent = '📋' }, 1200)
 }
 
 // Telefone que abre a conversa no WhatsApp
